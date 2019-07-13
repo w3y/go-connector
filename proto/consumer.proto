@@ -1,0 +1,46 @@
+syntax = "proto3";
+package pb;
+option go_package="github.com/w3y/go-connector/pb;models";
+
+message RmqExchQueueInfo {
+  string name = 1;
+  string type = 2;
+  bool auto_delete = 3;
+  bool durable = 4;
+  bool internal = 5;
+  bool exclusive = 6;
+  bool nowait = 7;
+  string routing_key = 8;
+  bool batch_ack = 9;
+}
+
+message ConsumerGroup {
+  string name = 1;
+}
+
+message RmqInputConf {
+  RmqExchQueueInfo exch = 1;
+  RmqExchQueueInfo queue = 2;
+  bool batch_ack = 3;
+  string mode = 4;
+}
+
+message RmqOutRoutingConf {
+  string routing_key = 1;
+  string type = 2;
+}
+
+message RmqOutputConf {
+  RmqExchQueueInfo exch = 1;
+  repeated RmqOutRoutingConf outputdefs = 2;
+  string mode = 4;
+}
+
+message RmqTaskConf {
+  string type = 1;
+  string name = 2;
+  ConsumerGroup group = 3;
+  repeated RmqInputConf inputs = 4;
+  repeated RmqOutputConf outputs = 5;
+  repeated string dms_clients = 6;
+}
