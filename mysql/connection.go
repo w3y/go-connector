@@ -4,8 +4,54 @@ import (
 	"database/sql"
 	"fmt"
 	_ "github.com/go-sql-driver/mysql"
+	"github.com/spf13/viper"
+	utils "github.com/w3y/go-commons"
 	"time"
 )
+
+const (
+	_maxOpenConn = 100
+	_maxIdleConn = 10
+)
+
+type Connection struct {
+	Host         string
+	Port         int
+	Protocol     string
+	User         string
+	Password     string
+	DatabaseName string
+	Charset      string
+	ParseTime    bool
+	Others       string
+	MaxOpenConn  int
+	MaxIdleConn  int
+}
+
+func NewDefaultConnectionConfig() *Connection {
+	maxOpenConn := viper.GetInt("mysql.max_open_conn")
+	if maxOpenConn <= 0 {
+		maxOpenConn = _maxOpenConn
+	}
+
+	maxIdleConn := viper.GetInt("mysql.max_idle_conn")
+	if maxIdleConn <= 0 {
+		maxIdleConn = _maxIdleConn
+	}
+	return &Connection{
+		Host:         viper.GetString("mysql.host"),
+		Port:         viper.GetInt("mysql.port"),
+		Protocol:     viper.GetString("mysql.protocol"),
+		User:         viper.GetString("mysql.user"),
+		Password:     viper.GetString("mysql.password"),
+		DatabaseName: viper.GetString("mysql.database_name"),
+		Charset:      viper.GetString("mysql.charset"),
+		ParseTime:    viper.GetBool("mysql.parse_time"),
+		Others:       viper.GetString("mysql.others"),
+		MaxOpenConn:  maxOpenConn,
+		MaxIdleConn:  maxIdleConn,
+	}
+}
 
 type Mysql struct {
 	*sql.DB
@@ -21,7 +67,7 @@ func NewConnection(conn *Connection) (*Mysql, error) {
 		conn.DatabaseName,
 		conn.Charset, conn.ParseTime,
 	)
-	if utils.IsStringNotEmpty(conn.Others) {
+	if !utils.IsStringEmpty(conn.Others) {
 		settings = fmt.Sprintf("%s&%s", settings, conn.Others)
 	}
 	db, err = sql.Open("mysql", settings)
@@ -44,11 +90,9 @@ func NewConnection(conn *Connection) (*Mysql, error) {
 	return &Mysql{db}, nil
 }
 
-
 func (c *Mysql) GetDB() *sql.DB {
 	return c.DB
 }
-
 
 func (c *Mysql) Close() {
 	if c == nil {
