@@ -25,7 +25,7 @@ var (
 
 var (
 	ErrSendToClosedProducer = errors.New("send to closed producer...exiting")
-	MaxThread = runtime.NumCPU()
+	MaxThread               = runtime.NumCPU()
 )
 
 func init() {
@@ -237,6 +237,11 @@ func (p *Producer) DeclareSpecificExch(xch *RmqConfig) error {
 
 func (p *Producer) DeclareExch() error {
 	return p.DeclareSpecificExch(&p.config.ExchangeConfig)
+}
+
+func (p *Producer) DeclareSpecificExchN(xch *models.RmqExchQueueInfo) error {
+	nxch := convertToRmqConf(xch)
+	return p.DeclareSpecificExch(nxch)
 }
 
 func (p *Producer) publish(c *amqp.Channel, mi *messageInfo) error {
