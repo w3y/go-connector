@@ -3,6 +3,7 @@ module github.com/w3y/go-connector
 go 1.12
 
 require (
+	github.com/go-redis/redis v6.15.2+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/golang/protobuf v1.3.1
 	github.com/spf13/viper v1.3.2
